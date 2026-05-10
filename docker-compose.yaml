@@ -1,15 +1,20 @@
 version: "3.9"
 services:
-  web:
-    image: mrkalb/ms-product
+  ms-product:
+    image: ms-product:2.0
     container_name: ms-product
     ports:
       - 8000:8000
   wiremock:
     image: wiremock/wiremock:2.33.2
     container_name: wiremock
-    ports:
-      - 8080
     volumes:
       - ./wiremock/mappings:/home/wiremock/mappings
+  ms-checkout: 
+    image: ms-checkout:3.0
+    container_name: ms-checkout
+    ports: 
+      - 8080:8080
+    environment:
+      - PRODUCT_SERVICE_URL=http://ms-product:8000
 
