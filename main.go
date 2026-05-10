@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
+
+var URL = "http://wiremock:8080/v1/products/"
 
 type Product struct {
 	Name       string  `json:"name"`
@@ -23,12 +26,11 @@ type ProductResponse struct {
 
 func ValidateProduct(c *gin.Context) {
 	var json Product
-	if err := c.ShouldBindJSON(&json); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		panic(err)
+	if !validatedRequest(c, &json) {
+		return
 	}
 
-	var url = "http://wiremock:8080/v1/products/" + json.ProductId
+	var url = URL + json.ProductId
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -43,17 +45,30 @@ func ValidateProduct(c *gin.Context) {
 		return
 	}
 
-	data, _ := ioutil.ReadAll(resp.Body)
+	data, _ := io.ReadAll(resp.Body)
 
+	jsonResponse := generateResponse(data, json)
+
+	c.JSON(200, gin.H{"body": *jsonResponse})
+}
+
+func generateResponse(data []byte, json Product) *ProductResponse {
 	jsonResponse := new(ProductResponse)
 
 	if strings.Contains(string(data), "In Stock") {
-		jsonResponse = populateResponse(json, "valid")
+		jsonResponse = populateResponse(json, "in stock")
 	} else {
-		jsonResponse = populateResponse(json, "invalid")
+		jsonResponse = populateResponse(json, "out of stock")
 	}
+	return jsonResponse
+}
 
-	c.JSON(200, gin.H{"body": *jsonResponse})
+func validatedRequest(c *gin.Context, json *Product) bool {
+	if err := c.ShouldBindJSON(json); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return false
+	}
+	return true
 }
 
 func populateResponse(

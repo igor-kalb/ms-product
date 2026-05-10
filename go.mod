@@ -1,6 +1,6 @@
 module ms-product
 
-go 1.18
+go 1.26.2
 
 require github.com/gin-gonic/gin v1.7.7
 
