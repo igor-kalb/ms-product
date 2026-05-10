@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-var URL = "http://wiremock:8080/v1/products/"
+var URL = os.Getenv("WIREMOCK_URL")
 
 type Product struct {
 	Name       string  `json:"name"`
