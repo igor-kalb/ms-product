@@ -1,0 +1,15 @@
+resources:
+  - k8s/wiremock/deployment.yaml
+  - k8s/wiremock/service.yaml
+  - k8s/wiremock/networkpolicy.yaml
+
+namespace: wiremock
+
+configMapGenerator:
+  - name: wiremock-mappings
+    options:
+      disableNameSuffixHash: true
+    files:
+      - wiremock/mappings/productId1.json
+      - wiremock/mappings/productId2.json
+      - wiremock/mappings/productId3.json
