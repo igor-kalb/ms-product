@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-product
+  namespace: ms-product
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-product
+  template:
+    metadata:
+      labels:
+        app: ms-product
+    spec:
+      containers:
+        - name: ms-product
+          image: ms-product:1.0.0
+          ports:
+            - containerPort: 8000
+          env:
+            - name: WIREMOCK_URL
+              value: "http://wiremock.wiremock.svc.cluster.local:8080/v1/products/"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
