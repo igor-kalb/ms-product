@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: wiremock-network-policy
+  namespace: wiremock
+spec:
+  podSelector:
+    matchLabels:
+      app: wiremock
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ms-product
+          podSelector:
+            matchLabels:
+              app: ms-product
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
