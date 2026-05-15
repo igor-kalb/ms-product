@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-checkout
+  namespace: ms-checkout
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-checkout
+  template:
+    metadata:
+      labels:
+        app: ms-checkout
+    spec:
+      containers:
+        - name: ms-checkout
+          image: ms-checkout:3.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PRODUCT_SERVICE_URL
+              value: "http://ms-product.ms-product.svc.cluster.local:8000"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"

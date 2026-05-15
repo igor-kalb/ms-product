@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-checkout
+  namespace: ms-checkout
+spec:
+  selector:
+    app: ms-checkout
+  ports:
+    - port: 8080
+      targetPort: 8080
